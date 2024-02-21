@@ -1,24 +1,74 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+import "./style.css";
+import javascriptLogo from "./javascript.svg";
+import viteLogo from "/vite.svg";
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+const notesContainer = document.querySelector("#app");
+const addNoteButton = notesContainer.querySelector(".add-note");
 
-setupCounter(document.querySelector('#counter'))
+getNotes().forEach((note) => {
+  const noteElement = createNoteElement(note.id, note.content);
+  notesContainer.insertBefore(noteElement, addNoteButton);
+});
+
+addNoteButton.addEventListener("click", () => addNote());
+
+function getNotes() {
+  return JSON.parse(localStorage.getItem("stickynotes-notes") || "[]");
+}
+
+function saveNotes(notes) {
+  localStorage.setItem("stickynotes-notes", JSON.stringify(notes));
+}
+
+function createNoteElement(id, content) {
+  const element = document.createElement("textarea");
+
+  element.classList.add("note");
+  element.value = content;
+  element.placeholder = "Empty sticky note";
+
+  element.addEventListener("change", () => {
+    updateNote(id, element.value);
+  });
+
+  element.addEventListener("dblclick", () => {
+    const doDelete = confirm(
+      "Are you sure you wish to delete this sticky note? "
+    );
+
+    if (doDelete) {
+      deleteNote(id, element);
+    }
+  });
+
+  return element;
+}
+
+function addNote() {
+  const notes = getNotes();
+  const noteObject = {
+    id: Math.floor(Math.random() * 100000),
+    content: "",
+  };
+
+  const noteElement = createNoteElement(noteObject.id, noteObject.content);
+  notesContainer.insertBefore(noteElement, addNoteButton);
+
+  notes.push(noteObject);
+  saveNotes(notes);
+}
+
+function updateNote(id, newContent) {
+  const notes = getNotes();
+  const targetNote = notes.filter((note) => note.id == id)[0]; //notes.find???
+
+  targetNote.content = newContent;
+  saveNotes(notes);
+}
+
+function deleteNote(id, element) {
+  const notes = getNotes().filter((note) => note.id != id);
+
+  saveNotes(notes);
+  notesContainer.removeChild(element);
+}
