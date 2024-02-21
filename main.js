@@ -1,6 +1,4 @@
 import "./style.css";
-import javascriptLogo from "./javascript.svg";
-import viteLogo from "/vite.svg";
 
 const notesContainer = document.querySelector("#app");
 const addNoteButton = notesContainer.querySelector(".add-note");
