@@ -1,5 +1,3 @@
-import "./style.css";
-
 const notesContainer = document.querySelector("#app");
 const addNoteButton = notesContainer.querySelector(".add-note");
 
